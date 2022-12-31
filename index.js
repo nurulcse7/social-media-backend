@@ -67,7 +67,20 @@ async function run() {
         })
 
 
-        
+        // put method 
+        app.put('/posts', async (req, res) => {
+            const { id } = req.query
+            const data = req.body
+            const query = { _id: ObjectId(id) }
+            const options = { upsert: true }
+            const updateData = {
+                $set: {
+                    loveReact: data.countLove + 1
+                }
+            }
+            const result = await postCollections.updateOne(query, updateData, options)
+            res.send(result)
+        })
     }
     catch {
         err => {
