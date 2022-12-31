@@ -24,7 +24,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     const postCollections = client.db('socialMedia').collection('posts')
     const userCollections = client.db('socialMedia').collection('users')
-   
+    const commentCollections = client.db('socialMedia').collection('comments')
     try {
         // post method 
         app.post('/users', async (req, res) => {
@@ -37,7 +37,11 @@ async function run() {
             const dataPosted = await postCollections.insertOne(data)
             res.send(dataPosted)
         })
-       
+        app.post('/comments', async (req, res) => {
+            const data = req.body
+            const dataPosted = await commentCollections.insertOne(data)
+            res.send(dataPosted)
+        })
 
         // get method 
         app.get('/posts', async (req, res) => {
@@ -51,7 +55,16 @@ async function run() {
             const post = await postCollections.find(query).sort({ _id: -1 }).toArray()
             res.send(post)
         })
-        
+        app.get('/comments', async (req, res) => {
+            const { id } = req.query
+            const query = { postId: id }
+            const comment = await commentCollections.find(query).sort({ _id: -1 }).toArray()
+            res.send(comment)
+        })
+        app.get('/popularPosts', async (req, res) => {
+            const popularPosts = await postCollections.find({}).limit(3).sort({ loveReact: -1 }).toArray()
+            res.send(popularPosts)
+        })
 
 
         
